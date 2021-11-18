@@ -42,7 +42,7 @@ def boardInit():            #Done for neatness as long lists can be scary to loo
             ['lib_tax', -100, -1,[]],
             ['db_2', 400, 0,[50,200,600,1400,1700,2000]]]
     
-    #Board layout = ['Place name', +price/-identifier, player owner, [rent prices 0-5 houses]]
+    #Board layout = ['Place name', +price/-identifier, player owner, [rent prices 0-5 houses]] should probably change to a tuple, remember to do performance benchmarks
     #Prices all retrieved from monopoly.fandom.com
 
 def sizeCheck(board):       #For pedantic object byte size checking, shouldn't really be used in actual software
@@ -73,9 +73,24 @@ def rollInit():             #return jailCheck(int), roll(int)
             print(f'Double {die1}!!')
             jailCheck += 1
     return jailCheck, roll
+
+def playerInit(playerNum):
+    name = input(f"Player {playerNum}! Please enter your nickname:")
+    p_add_intentions = True
+    while p_add_intentions is True: #Ensures 
+        player_add = str(input("Would you like to add another player? (Y/N):"))
+        if player_add.upper() == "Y":
+            return name,p_add_intentions
+        if player_add.upper() == "N":
+            p_add_intentions = False
+            return name,p_add_intentions
+        else:
+            print("Please enter a Y or N")
+    
     
 board = boardInit()         #Board data, lines 3-46
 sizeCheck(board)
+playerInit(1)
 
 jailCheck, roll = rollInit() 
 if(jailCheck >= 3):
