@@ -74,13 +74,13 @@ def roll_init():             #return jailCheck(int), roll(int)
             jailCheck += 1
     return jailCheck, roll
 
-def player_new(player_num):
+def player_new():
     p_add_intentions = True
     while p_add_intentions is True: 
         player_add = str(input("Would you like to add another player? (Y/N):"))
         if player_add.upper() == "Y":
-            player_num += 1
             return p_add_intentions
+            
         if player_add.upper() == "N":
             p_add_intentions = False
             return p_add_intentions
@@ -93,14 +93,16 @@ def player_init():          #return player_list(list), player_num(int)
     player_num=1
     max_players = 6
     
-    while player_creation == True and player_num<7:
+    while player_creation == True and player_num<=max_players:
         
         name = input(f"Player {player_num}! Please enter your nickname:")
-        player_list.append([name,1500])  #playerID = index + 1 [Money]
-        if player_num < max_players:  #Checks to see if it's under the max amount of players
-            player_creation = player_new(player_num)
-            if player_creation == True: 
-                player_num+=1
+        player_list.append([name,1500,0])  #playerID = index + 1 [name,Money(int),space(starts on go)]
+        player_num+=1
+        if player_num <= max_players:  #Checks to see if it's under the max amount of players to ask for permission to add a new player
+            player_creation = player_new()
+        else:
+            print(f'The maximum number of players has been reached! {max_players} Let\'s start!')
+            
     return player_list, player_num
 
         
@@ -114,7 +116,7 @@ def player_init():          #return player_list(list), player_num(int)
 board = board_init()         #Board data, lines 3-46
 size_check(board)
 
-player_list, num_of_players = player_init()
+player_info_list, num_of_players = player_init()
 
 jailCheck, roll = roll_init() 
 if(jailCheck >= 3):
