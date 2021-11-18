@@ -1,6 +1,6 @@
 import random, sys          #Random for random num generator, sys for sizeCheck()
 
-def boardInit():            #Done for neatness as long lists can be scary to look at
+def board_init():            #Done for neatness as long lists can be scary to look at
     return [['Go', -1, -1,[]],
             ['br1', 60, 0,[2,10,30,90,160,250]],
             ['cc_1', -1, -1,[]],
@@ -45,7 +45,7 @@ def boardInit():            #Done for neatness as long lists can be scary to loo
     #Board layout = ['Place name', +price/-identifier, player owner, [rent prices 0-5 houses]] should probably change to a tuple, remember to do performance benchmarks
     #Prices all retrieved from monopoly.fandom.com
 
-def sizeCheck(board):       #For pedantic object byte size checking, shouldn't really be used in actual software
+def size_check(board):       #For pedantic object byte size checking, shouldn't really be used in actual software
     totalSize = 0
     objectSize = 0
     objectObjectSize = 0
@@ -56,7 +56,7 @@ def sizeCheck(board):       #For pedantic object byte size checking, shouldn't r
     
     print(f'Total Size = {totalSize + sys.getsizeof(board)}')
 
-def rollInit():             #return jailCheck(int), roll(int)
+def roll_init():             #return jailCheck(int), roll(int)
     rollPhase = 0
     roll = 0
     jailCheck = 0
@@ -74,7 +74,7 @@ def rollInit():             #return jailCheck(int), roll(int)
             jailCheck += 1
     return jailCheck, roll
 
-def playerInit(playerNum):
+def player_init(playerNum):
     name = input(f"Player {playerNum}! Please enter your nickname:")
     p_add_intentions = True
     while p_add_intentions is True: #Ensures 
@@ -87,12 +87,19 @@ def playerInit(playerNum):
         else:
             print("Please enter a Y or N")
     
+def players():
+    players = "a"
     
-board = boardInit()         #Board data, lines 3-46
-sizeCheck(board)
-playerInit(1)
+    
 
-jailCheck, roll = rollInit() 
+
+
+board = board_init()         #Board data, lines 3-46
+size_check(board)
+
+player_init(1)
+
+jailCheck, roll = roll_init() 
 if(jailCheck >= 3):
     print('Go directly to jail! Do not pass go >:c')
 else:
