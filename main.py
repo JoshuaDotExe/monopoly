@@ -1,4 +1,4 @@
-import random, sys          #Random for random num generator, sys for sizeCheck()
+import random, sys, time     #Random for random num generator, sys for size_check()
 
 def board_init():            #Done for neatness as long lists can be scary to look at
     return [['Go', -1, -1,[]],
@@ -74,21 +74,38 @@ def roll_init():             #return jailCheck(int), roll(int)
             jailCheck += 1
     return jailCheck, roll
 
-def player_init(playerNum):
-    name = input(f"Player {playerNum}! Please enter your nickname:")
+def player_new(player_num):
     p_add_intentions = True
-    while p_add_intentions is True: #Ensures 
+    while p_add_intentions is True: 
         player_add = str(input("Would you like to add another player? (Y/N):"))
         if player_add.upper() == "Y":
-            return name,p_add_intentions
+            player_num += 1
+            return p_add_intentions
         if player_add.upper() == "N":
             p_add_intentions = False
-            return name,p_add_intentions
+            return p_add_intentions
         else:
             print("Please enter a Y or N")
     
-def players():
-    players = "a"
+def player_init():          #return player_list(list), player_num(int)
+    player_creation = True
+    player_list = []
+    player_num=1
+    max_players = 6
+    
+    while player_creation == True and player_num<7:
+        
+        name = input(f"Player {player_num}! Please enter your nickname:")
+        player_list.append([name,1500])  #playerID = index + 1 [Money]
+        if player_num < max_players:  #Checks to see if it's under the max amount of players
+            player_creation = player_new(player_num)
+            if player_creation == True: 
+                player_num+=1
+    return player_list, player_num
+
+        
+            
+            
     
     
 
@@ -97,7 +114,7 @@ def players():
 board = board_init()         #Board data, lines 3-46
 size_check(board)
 
-player_init(1)
+player_list, num_of_players = player_init()
 
 jailCheck, roll = roll_init() 
 if(jailCheck >= 3):
