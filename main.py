@@ -105,22 +105,22 @@ def player_init():          #return player_list(list), player_num(int)
             
     return player_list, player_num
 
+def turn(player_space):
+    jailCheck, roll = roll_init()
+    if(jailCheck >= 3):
+        print('Go directly to jail! Do not pass go >:c')
+        player_space = 10   #In jail!
+    else:
+        player_space += roll
+    return player_space
         
-            
-            
-    
-    
-
-
-
-board = board_init()         #Board data, lines 3-46
+        
+board = board_init()         #Board data
 size_check(board)
-
 player_info_list, num_of_players = player_init()
 
-jailCheck, roll = roll_init() 
-if(jailCheck >= 3):
-    print('Go directly to jail! Do not pass go >:c')
-else:
-    print("Roll = " + str(roll))
-    print("Board Space : " + str(board[roll][0]))
+for x in range(num_of_players-1):
+    print(f'Player {x+1}\'s turn!')
+    player_info_list[x][2] = turn(player_info_list[x][2])
+    print(f'Player {x+1} has landed on space {board[player_info_list[x][2]]}\n')
+ 
