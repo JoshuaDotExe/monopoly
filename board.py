@@ -1,16 +1,17 @@
 from properties import property
-from events import *
+from events import event, ownable_event
+from cards import card
 
 class board:
     def board_init():
         go = event('GO', 0)
         brown_1 = property('Brown 1', 60, (2,10,30,90,160,250), 0, 0)
-        community_chest = event('Community Chest', 1)
+        community_chest = card('Community Chest', 1)
         brown_2 = property('Brown 2', 60, (2,10,30,90,160,250), 0, 0)
         income_tax = event('Income Tax', 3)
         rail_1 = ownable_event('Rail 1', 5, 0, 0)                                                 #Ownable event
         light_b_1 = property('Light Blue 1', 100, (6,30,90,270,400,550), 0, 0)
-        chance = event('Chance', 2)
+        chance = card('Chance', 2)
         light_b_2 = property('Light Blue 2', 100, (6,30,90,270,400,550), 0, 0)
         light_b_3 = property('Light Blue 2', 120, (8,40,100,300,450,600), 0, 0)
         jail = event('Jail', 10)

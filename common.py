@@ -2,7 +2,7 @@ import random, os, sys, time
 
 from board import *
 from properties import *
-from players import *
+from players import player
 from events import *
 
 def debug_player_create():
@@ -47,3 +47,9 @@ def jailer():
     print('Go straight to jail! Do not pass go and do not collect $200!')
     player_space = 10
     return player_space
+
+def shuffle_cards(diction):
+        l = list(diction.items())
+        random.shuffle(l)
+        diction = dict(l)
+        return diction
