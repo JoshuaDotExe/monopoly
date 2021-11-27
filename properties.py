@@ -6,3 +6,5 @@ class property:
         self.num_of_houses = num_of_houses
         self.owner = owner
         
+    def get_rent(property, int):
+        return property.rent[int]
