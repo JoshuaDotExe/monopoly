@@ -1,5 +1,7 @@
 # monopoly
-All my experimentation with the game monopoly with python proof of concept and where necessary c++ optimization 
+All my experimentation with the game monopoly with python proof of concept
 
-## turn
-Player rolls dice, program finds out what space they landed on,
+## ideals
+
+I hope for this project to be able to expand into one dealing with organising, sorting and displaying information from large sets of data, along with being able to dabble in neural networks
+
