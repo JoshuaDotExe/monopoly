@@ -112,6 +112,7 @@ class card:
             14 : consult_fee,
             15 : str_repairs
             }
+        print('community chest cards loaded')
         return cc_cards
     def chance_init():
         def adv_2_go(current_player, board, player_list):
@@ -223,4 +224,5 @@ class card:
             14 : pay_50_2all,
             15 : build_loan
         }
+        print('chance cards loaded')
         return chn_cards

@@ -8,26 +8,27 @@ class event:
         self.ID = ID
         
     def diction():              #p_bal, p_in_jail, p_space
-        def go(p_bal, p_in_jail, p_space, p_num):
+        def go(current_player):
             print('Collect $400!')
-            p_bal += 400
-            return p_bal, p_in_jail, p_space, p_num
+            current_player.balance += 400
+            return current_player
         
-        def jail(p_bal, p_in_jail, p_space, p_num):
-            if p_in_jail == False:
+        def jail(current_player):
+            if current_player.is_jailed == False:
                 print("You're just visiting!")
-                return p_in_jail, p_bal
+                return current_player
             else:
                 print('Pay the fine or serve your sentence!!')
+                current_player.is_jailed = True
                 fin = False
                 while fin == False:
                     user_in = input('Type in PAY or ROLL :')
                     if user_in.upper == 'PAY':
-                        p_bal -= 50
+                        current_player.balance -= 50
                         fin = True
-                        p_in_jail = False
+                        current_player.is_jailed = False
                         print('Much obliged, you\'re free to go!')
-                        return p_bal, p_in_jail, p_space, p_num
+                        return current_player
                     elif user_in.upper == 'ROLL':
                         print('Good luck getting those doubles!')    
                         fin = True
@@ -35,31 +36,31 @@ class event:
                         die2 = random.randint(1,6)
                         if die1 == die2:
                             print(f'Double {die1}!\nYou\'re free to go!')
-                            p_in_jail = False
-                            return p_bal, p_in_jail, p_space, p_num
+                            current_player.is_jailed = False
+                            return current_player
                         else:
-                            print(f'Rolled a {die1} and a {die2}\nLooks like you\'ll be staying here a while longer!')
-                            return p_bal, p_in_jail, p_space, p_num
+                            print(f'Rolled a {die1} and a {die2}\nLooks like you\'ll be staying here a while longer!') #Should add 3 turn rule by turning is_jailed into an int
+                            return current_player
                     else:
                         print('Please input PAY or ROLL')
                           
-        def free_prk(p_bal, p_in_jail, p_space, p_num):
+        def free_prk(current_player):
             print('Woo! Free Parking!')
-            return p_bal, p_in_jail, p_space, p_num
+            return current_player
         
-        def go_2_jail(p_bal, p_in_jail, p_space, p_num):
+        def go_2_jail(current_player):
             print('Go Straight to jail! Do not pass go and do not collect $200!')
-            p_space = 10
-            p_in_jail = True
-            return p_bal, p_in_jail, p_space, p_num
-        def in_tax(p_bal, p_in_jail, p_space, p_num):
+            current_player.space = 10
+            current_player.is_jailed = True
+            return current_player
+        def in_tax(current_player):
             print('Pay $200 in income taxes!')
-            p_bal -= 200
-            return p_bal, p_in_jail, p_space, p_num
-        def lib_tax(p_bal, p_in_jail, p_space, p_num):
+            current_player.balance -= 200
+            return current_player
+        def lib_tax(current_player):
             print('Pay $100 in taxes!')
-            p_bal -= 100
-            return p_bal, p_in_jail, p_space, p_num
+            current_player.balance -= 100
+            return current_player
         event_index = {
             0 : go,
             4 : in_tax,
@@ -87,9 +88,9 @@ class ownable_event:
                 else:
                     pass
                 return current_player, board, player_list
-            elif board[5].owner == current_player.player_num:
+            elif board[5].owner == current_player.num:
                 home_turf()
-            elif board[5].owner != current_player.player_num:
+            elif board[5].owner != current_player.num:
                 current_player, board, player_list = owned(current_player, board, player_list)
                 return current_player, board, player_list
             else:
@@ -104,9 +105,9 @@ class ownable_event:
                 else:
                     pass
                 return current_player, board, player_list
-            elif board[15].owner == current_player.player_num:
+            elif board[15].owner == current_player.num:
                 home_turf()
-            elif board[15].owner != current_player.player_num:
+            elif board[15].owner != current_player.num:
                 current_player, board, player_list = owned(current_player, board, player_list)
                 return current_player, board, player_list
             else:
@@ -121,9 +122,9 @@ class ownable_event:
                 else:
                     pass
                 return current_player, board, player_list
-            elif board[25].owner == current_player.player_num:
+            elif board[25].owner == current_player.num:
                 home_turf()
-            elif board[25].owner != current_player.player_num:
+            elif board[25].owner != current_player.num:
                 current_player, board, player_list = owned(current_player, board, player_list)
                 return current_player, board, player_list
             else:
@@ -138,9 +139,9 @@ class ownable_event:
                 else:
                     pass
                 return current_player, board, player_list
-            elif board[35].owner == current_player.player_num:
+            elif board[35].owner == current_player.num:
                 home_turf()
-            elif board[35].owner != current_player.player_num:
+            elif board[35].owner != current_player.num:
                 current_player, board, player_list = owned(current_player, board, player_list)
                 return current_player, board, player_list
             else:
@@ -148,7 +149,7 @@ class ownable_event:
                 return current_player, board, player_list
         
         def telecom_1(current_player, board, player_list):
-            if board[12].owner == current_player.player_num:
+            if board[12].owner == current_player.num:
                 home_turf()
                 return current_player, board, player_list
             elif board[12].owner == 0:
@@ -159,7 +160,7 @@ class ownable_event:
                 return current_player, board, player_list
         
         def telecom_2(current_player, board, player_list):
-            if board[28].owner == current_player.player_num:
+            if board[28].owner == current_player.num:
                 home_turf()
                 return current_player, board, player_list
             elif board[28].owner == 0:
@@ -180,17 +181,19 @@ class ownable_event:
         return ownable_event_index
         
     def rail_check(current_player, board):
-        p_num = current_player.player_num
         num_of_rails = 0
         l = [board[5], board[15], board[25], board[35]]
         for x in l:
-            if x.owner == p_num:
+            if x.owner == current_player.num:
                 num_of_rails += 1
             else:
-                l.remove(x)
+                pass
         for x in l:
-            x.num_of_houses = num_of_rails
-            
+            if x.owner == current_player.num:
+                x.num_of_houses = num_of_rails
+                print(f'Num rails = {x.num_of_houses} on {x.name}')
+            else:
+                pass
         return current_player, board
             
         

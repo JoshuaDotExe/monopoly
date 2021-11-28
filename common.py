@@ -53,3 +53,41 @@ def shuffle_cards(diction):
         random.shuffle(l)
         diction = dict(l)
         return diction
+
+def rich_enough(price, balance):
+    if price <= balance:
+        return True
+    elif price > balance:
+        return False
+    else:
+        print('Err: common.rich_enough')
+
+def unowned(current_player, board):
+    space = current_player.space
+    print(f'Space = {space}')
+    suf_bal = rich_enough(board[space].value,current_player.balance)
+    if suf_bal == True:
+        user_in = input(f'This property is unowned! Would you like to purchase it for ${board[current_player.space].value}?\nYES or NO :')
+        while True:
+            if user_in.upper() == 'YES':
+                current_player.balance -= board[space].value
+                board[space].owner = current_player.num
+                print(f'Congratulations! You\'ve bought {board[space].name}')
+                return current_player, board
+            elif user_in.upper() == 'NO':
+                print('Maybe next time!')
+                return current_player, board
+            else:
+                user_in = input('Please enter a YES or NO :')
+    else:
+        print('Looks like you don\'t have enough for this property! Maybe next time')
+        return current_player, board
+
+def owned(current_player, board, player_list):
+    print('Uh oh, pay up along with some really cool ascii graphics')
+    return current_player, board, player_list
+    
+def home_turf():
+    print('You own this! Safe and sound')
+    return
+    
