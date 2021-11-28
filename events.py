@@ -1,5 +1,6 @@
 import random
 from cards import card
+from common import owned, unowned, home_turf
 
 class event:
     def __init__(self, name, ID):
@@ -8,7 +9,7 @@ class event:
         
     def diction():              #p_bal, p_in_jail, p_space
         def go(p_bal, p_in_jail, p_space, p_num):
-            print('GO')
+            print('Collect $400!')
             p_bal += 400
             return p_bal, p_in_jail, p_space, p_num
         
@@ -70,36 +71,103 @@ class event:
         return event_index
     
 class ownable_event:
-    def __init__(self, name, ID, owner, num_of_houses):
+    def __init__(self, name, ID, value, owner, num_of_houses):
         self.name = name
         self.ID = ID
+        self.value = value
         self.owner = owner
         self.num_of_houses = num_of_houses
     
     def diction():
-        def rail1():
-            print('I really need to finish the railway event functions')
-            return 
+        def rail1(current_player, board, player_list):
+            if board[5].owner == 0:
+                current_player, board = unowned(current_player, board)
+                if board[5].owner == current_player.num:
+                    current_player, board = ownable_event.rail_check(current_player, board)
+                else:
+                    pass
+                return current_player, board, player_list
+            elif board[5].owner == current_player.player_num:
+                home_turf()
+            elif board[5].owner != current_player.player_num:
+                current_player, board, player_list = owned(current_player, board, player_list)
+                return current_player, board, player_list
+            else:
+                print('Owner value: Invalid')
+                return current_player, board, player_list 
         
-        def rail2():
-            print('I really need to finish the railway event functions')
-            return 
+        def rail2(current_player, board, player_list):
+            if board[15].owner == 0:
+                current_player, board = unowned(current_player, board)
+                if board[15].owner == current_player.num:
+                    current_player, board = ownable_event.rail_check(current_player, board)
+                else:
+                    pass
+                return current_player, board, player_list
+            elif board[15].owner == current_player.player_num:
+                home_turf()
+            elif board[15].owner != current_player.player_num:
+                current_player, board, player_list = owned(current_player, board, player_list)
+                return current_player, board, player_list
+            else:
+                print('Owner value: Invalid')
+                return current_player, board, player_list
         
-        def rail3():
-            print('I really need to finish the railway event functions')
-            return 
+        def rail3(current_player, board, player_list):
+            if board[25].owner == 0:
+                current_player, board = unowned(current_player, board)
+                if board[25].owner == current_player.num:
+                    current_player, board = ownable_event.rail_check(current_player, board)
+                else:
+                    pass
+                return current_player, board, player_list
+            elif board[25].owner == current_player.player_num:
+                home_turf()
+            elif board[25].owner != current_player.player_num:
+                current_player, board, player_list = owned(current_player, board, player_list)
+                return current_player, board, player_list
+            else:
+                print('Owner value: Invalid')
+                return current_player, board, player_list
         
-        def rail4():
-            print('I really need to finish the railway event functions')
-            return 
+        def rail4(current_player, board, player_list):
+            if board[35].owner == 0:
+                current_player, board = unowned(current_player, board)
+                if board[35].owner == current_player.num:
+                    current_player, board = ownable_event.rail_check(current_player, board)
+                else:
+                    pass
+                return current_player, board, player_list
+            elif board[35].owner == current_player.player_num:
+                home_turf()
+            elif board[35].owner != current_player.player_num:
+                current_player, board, player_list = owned(current_player, board, player_list)
+                return current_player, board, player_list
+            else:
+                print('Owner value: Invalid')
+                return current_player, board, player_list
         
-        def telecom_1():
-            print('I really need to finish the telecomms event functions')
-            return 
+        def telecom_1(current_player, board, player_list):
+            if board[12].owner == current_player.player_num:
+                home_turf()
+                return current_player, board, player_list
+            elif board[12].owner == 0:
+                current_player, board = unowned(current_player, board)
+                return current_player, board, player_list
+            else:
+                print('Owner value: Invalid')
+                return current_player, board, player_list
         
-        def telecom_2():
-            print('I really need to finish the telecomms event functions')
-            return 
+        def telecom_2(current_player, board, player_list):
+            if board[28].owner == current_player.player_num:
+                home_turf()
+                return current_player, board, player_list
+            elif board[28].owner == 0:
+                current_player, board = unowned(current_player, board)
+                return current_player, board, player_list
+            else:
+                print('Owner value: Invalid')
+                return current_player, board, player_list
     
         ownable_event_index = {
             5 : rail1,
@@ -110,6 +178,22 @@ class ownable_event:
             35: rail4
         }
         return ownable_event_index
+        
+    def rail_check(current_player, board):
+        p_num = current_player.player_num
+        num_of_rails = 0
+        l = [board[5], board[15], board[25], board[35]]
+        for x in l:
+            if x.owner == p_num:
+                num_of_rails += 1
+            else:
+                l.remove(x)
+        for x in l:
+            x.num_of_houses = num_of_rails
+            
+        return current_player, board
+            
+        
         
         
         
