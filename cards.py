@@ -7,84 +7,90 @@ class card:
         self.name = name
         self.ID = ID
 
+    def __repr__(self):
+        return "Card : {}".format(self.name)
+    
     def com_chest_init():                   #p_bal, p_space, p_in_jail, board, player_list
-        def adv_2_go(current_player, board, player_list):
+        def adv_2_go(p, board, player_list):
             print('Advance to GO!')
-            current_player.space = 0
-            current_player.balance += 400
-            return current_player, board, player_list
-        def bnk_err(current_player, board, player_list):
+            p.space = 0
+            return p, board, player_list
+
+        def bnk_err(p, board, player_list):
             print('There was a bank error in your favour! Collect $200!')
-            current_player.balance =+ 200
-            return current_player, board, player_list
-        def doc_fee(current_player, board, player_list):
+            p = player.bal_plus(p, 200)
+            return p, board, player_list
+        
+        def doc_fee(p, board, player_list):
             print('Pay doctor\'s fees of $50')
-            current_player.balance -= 50
-            return current_player, board, player_list
-        def go_jail(current_player, board, player_list):
+            p = player.bal_minus(p, 50)
+            return p, board, player_list
+        
+        def go_jail(p, board, player_list):
             print('Go Straight to jail! Do not pass go and do not collect $200!')
-            current_player.space = 10
-            current_player.is_jailed = True
-            return current_player, board, player_list
-        def beau_cont(current_player, board, player_list):
+            p.space = 10
+            p.is_jailed = True
+            return p, board, player_list
+        
+        def beau_cont(p, board, player_list):
             print('You\'ve won a beauty contest! Collect $10!')
-            current_player.balance += 10
-            return current_player, board, player_list
-        def sale_of_stock(current_player, board, player_list):
+            p = player.bal_plus(p, 10)
+            return p, board, player_list
+        def sale_of_stock(p, board, player_list):
             print('You\'ve made a profit from selling stocks! Collect $50!')
-            current_player.balance += 50
-            return current_player, board, player_list
-        def grnd_op(current_player, board, player_list):
+            p = player.bal_plus(p, 50)
+            return p, board, player_list
+        def grnd_op(p, board, player_list):
             print('You host a grand opera night! Collect $50 from every player!')       #Implement collecting func here
             num_players = len(player_list)
-            current_player.balance += 50*num_players
+            p = player.bal_plus(p, (50*num_players))
             for x in player_list:
-                if current_player !=x:
+                if p != x:
                     x.balance -= 50
                 else:
                     pass
                 pass
-            return current_player, board, player_list
-        def holiday_fund(current_player, board, player_list):
+            return p, board, player_list
+        def holiday_fund(p, board, player_list):
             print('Your holiday fund matures, collect $100!')
-            current_player.balance += 100
-            return current_player, board, player_list
-        def tax_ref(current_player, board, player_list):
+            p = player.bal_plus(p, 100)
+            return p, board, player_list
+        def tax_ref(p, board, player_list):
             print('You get a tax refund! Collect $20!')
-            current_player.balance += 20
-            return current_player, board, player_list
-        def brth_d(current_player, board, player_list):
+            p = player.bal_plus(p, 20)
+            return p, board, player_list
+        def brth_d(p, board, player_list):
             print('It\'s your birthday! Collect $10 from every player!')                 #Implement collecting func here
             num_players = len(player_list)
-            current_player.balance += 10*num_players
+            p = player.bal_plus(p, (10*num_players))
             for x in player_list:
-                if current_player !=x:
-                    x.balance -= 10
+                if p !=x:
+                    x = player.bal_minus(x, 10)
                 else:
                     pass
                 pass
-            return current_player, board, player_list
-        def life_ins(current_player, board, player_list):
+            return p, board, player_list
+        def life_ins(p, board, player_list):
             print('Life insurance premiums increase, pay $100')
-            current_player.balance -= 100
-            return current_player, board, player_list
-        def hosp_fee(current_player, board, player_list):
+            p = player.bal_plus(p, 100)
+            return p, board, player_list
+        def hosp_fee(p, board, player_list):
             print('Hospital fees come due! Pay $50')
-            current_player.balance -= 50
-            return current_player, board, player_list
-        def school_fee(current_player, board, player_list):
+            p = player.bal_minus(p, 50)
+            return p, board, player_list
+        def school_fee(p, board, player_list):
             print('A new school term starts, pay $50 in school fees')
-            current_player.balance -= 50
-            return current_player, board, player_list
-        def consult_fee(current_player, board, player_list):
+            p = player.bal_minus(p, 50)
+            return p, board, player_list
+        def consult_fee(p, board, player_list):
             print('A new school term starts, pay $50 in school fees')
-            current_player.balance -= 50
-            return current_player, board, player_list
-        def str_repairs(current_player, board, player_list):                                                            #Implement house num collecting func here
+            p = player.bal_minus(p, 50)
+            return p, board, player_list
+        def str_repairs(p, board, player_list):                                                            #Implement house num collecting func here
             print('You\'ve been made liable for street repair infront of your buildings, pay $25 per house and $50 per hotel!')
             total = 0
             for space in board:
-                if type(space) == property and space.owner == current_player.player_num:
+                if type(space) == property and space.owner == p.player_num:
                     if space.num_of_houses < 5 and space.num_of_houses > 0:
                         total += space.num_of_houses*25
                     elif space.num_of_houses == 5:
@@ -93,8 +99,8 @@ class card:
                         pass
                 else:
                     pass
-            current_player.balance -= total
-            return current_player, board, player_list    
+            p = player.bal_minus(p, total)
+            return p, board, player_list    
         cc_cards = {
             1 : adv_2_go,
             2 : bnk_err,
@@ -112,64 +118,63 @@ class card:
             14 : consult_fee,
             15 : str_repairs
             }
-        print('community chest cards loaded')
+        cc_cards = card.randomize(cc_cards)
         return cc_cards
     def chance_init():
-        def adv_2_go(current_player, board, player_list):
+        def adv_2_go(p, board, player_list):
             print('Advance to GO!')
-            current_player.space = 0
-            current_player.balance += 400
-            return current_player, board, player_list
-        def adv_2_24(current_player, board, player_list):
+            p.space = 0
+            return p, board, player_list
+        def adv_2_24(p, board, player_list):
             print('Advance to Red 3')
-            current_player.space = 0
-            return current_player, board, player_list
-        def adv_2_11(current_player, board, player_list):
+            p.space = 0
+            return p, board, player_list
+        def adv_2_11(p, board, player_list):
             print('Advance to Pink 1')
-            current_player.space = 11
-            return current_player, board, player_list
-        def adv_2_util(current_player, board, player_list):
+            p.space = 11
+            return p, board, player_list
+        def adv_2_util(p, board, player_list):
             print('Advance to the nearest utility! If a player owns it pay 10 times your dice roll!')
-            if current_player.space > 12 and current_player.space < 28:
-                current_player.space = 28
+            if p.space > 12 and p.space < 28:
+                p.space = 28
             else:
-                current_player.space = 12
-            return current_player, board, player_list
-        def adv_2_rail(current_player, board, player_list):
+                p.space = 12
+            return p, board, player_list
+        def adv_2_rail(p, board, player_list):
             print('Advance to the nearest Railway Station')
-            if current_player.space>35 and current_player.space<5:
-                current_player.space = 5
-            elif current_player.space>5 and current_player.space<15:
-                current_player.space = 15
-            elif current_player.space>15 and current_player.space<25:
-                current_player.space = 25
-            elif current_player.space>25 and current_player.space<35:
-                current_player.space = 35
+            if p.space>35 and p.space<5:
+                p.space = 5
+            elif p.space>5 and p.space<15:
+                p.space = 15
+            elif p.space>15 and p.space<25:
+                p.space = 25
+            elif p.space>25 and p.space<35:
+                p.space = 35
             else:
                 print('Invalid rail search')
-            return current_player, board, player_list
-        def bnk_div(current_player, board, player_list):
+            return p, board, player_list
+        def bnk_div(p, board, player_list):
             print('The bank pays your dividend! Collect $50!')
-            current_player.balance += 50
-            return current_player, board, player_list
-        def croswrd_comp(current_player, board, player_list):
+            p.balance += 50
+            return p, board, player_list
+        def croswrd_comp(p, board, player_list):
             print('You win a crossword competition! Collect $100!')
-            current_player.balance += 100
-            return current_player, board, player_list
-        def go_back_3(current_player, board, player_list):
+            p.balance += 100
+            return p, board, player_list
+        def go_back_3(p, board, player_list):
             print('Go back 3 spaces!')
-            current_player.space -= 3
-            return current_player, board, player_list
-        def head_jail(current_player, board, player_list):
+            p.space -= 3
+            return p, board, player_list
+        def head_jail(p, board, player_list):
             print('Go Straight to jail! Do not pass go and do not collect $200!')
-            current_player.space = 10
-            current_player.is_jailed = True
-            return current_player, board, player_list
-        def build_repairs(current_player, board, player_list):                                    #Implement house num collecting func here
+            p.space = 10
+            p.is_jailed = True
+            return p, board, player_list
+        def build_repairs(p, board, player_list):                                    #Implement house num collecting func here
             print('Your buildings have become run down, pay $25 per house and $50 per hotel to renovate!')
             total = 0
             for space in board:
-                if type(space) == property and space.owner == current_player.player_num:
+                if type(space) == property and space.owner == p.player_num:
                     if space.num_of_houses < 5 and space.num_of_houses > 0:
                         total += space.num_of_houses*25
                     elif space.num_of_houses == 5:
@@ -178,35 +183,35 @@ class card:
                         pass
                 else:
                     pass
-            current_player.balance -= total
-            return current_player, board, player_list 
-        def poor_tax(current_player, board, player_list):
+            p.balance -= total
+            return p, board, player_list 
+        def poor_tax(p, board, player_list):
             print('The IRS has caught up with your tax evasion, pay $15 in poor people taxes')
-            current_player.balance -= 15
-            return current_player, board, player_list
-        def adv_2_5(current_player, board, player_list):
+            p.balance -= 15
+            return p, board, player_list
+        def adv_2_5(p, board, player_list):
             print('Advance to Rail 1!')
-            current_player.space = 5
-            return current_player, board, player_list
-        def adv_2_39(current_player, board, player_list):
+            p.space = 5
+            return p, board, player_list
+        def adv_2_39(p, board, player_list):
             print('Advance to Dark Blue 1!')
-            current_player.space = 39
-            return current_player, board, player_list
-        def pay_50_2all(current_player, board, player_list):
+            p.space = 39
+            return p, board, player_list
+        def pay_50_2all(p, board, player_list):
             print('You\'ve been elected chairman of the board! Pay out $50 to each player in bribes')   #Implement collecting func here
             num_players = len(player_list)
-            current_player.balance -= 50*num_players
+            p.balance -= 50*num_players
             for x in player_list:
-                if current_player !=x:
+                if p !=x:
                     x.balance += 50
                 else:
                     pass
                 pass
-            return current_player, board, player_list
-        def build_loan(current_player, board, player_list):
+            return p, board, player_list
+        def build_loan(p, board, player_list):
             print('Your building loan matures, collect $150!')
-            current_player.balance += 150
-            return current_player, board, player_list        
+            p.balance += 150
+            return p, board, player_list        
         chn_cards = {
             1 : adv_2_go,
             2 : adv_2_24,
@@ -224,5 +229,12 @@ class card:
             14 : pay_50_2all,
             15 : build_loan
         }
-        print('chance cards loaded')
+        chn_cards = card.randomize(chn_cards)
         return chn_cards
+    
+    def randomize(dictionary):
+            l = list(dictionary.items())
+            random.shuffle(l)
+            dictionary = dict(l)
+            return dictionary
+    
