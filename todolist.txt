@@ -1,0 +1,9 @@
+help func > Look up other examples
+
+trade func >
+
+add function for adding/removing houses
+
+inventory func for looking up what properties players own as well as being able to look up a specific property name
+
+
