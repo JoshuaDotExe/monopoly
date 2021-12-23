@@ -49,4 +49,3 @@ class board:
         print(board[1])
         return board
     
-    

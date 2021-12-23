@@ -60,15 +60,12 @@ class card:
             p = player.bal_plus(p, 20)
             return p, board, player_list
         def brth_d(p, board, player_list):
-            print('It\'s your birthday! Collect $10 from every player!')                 #Implement collecting func here
-            num_players = len(player_list)
-            p = player.bal_plus(p, (10*num_players))
-            for x in player_list:
-                if p !=x:
-                    x = player.bal_minus(x, 10)
-                else:
-                    pass
-                pass
+            print('It\'s your birthday! Collect $10 from every player!')                 #Implement collecting func here 
+            p = player.bal_plus(p, (10*(len(player_list)-1)))
+            gift_list = player_list
+            del gift_list[p.num]
+            for x in gift_list:
+                x = player.bal_minus(x, 10)
             return p, board, player_list
         def life_ins(p, board, player_list):
             print('Life insurance premiums increase, pay $100')
@@ -233,8 +230,13 @@ class card:
         return chn_cards
     
     def randomize(dictionary):
-            l = list(dictionary.items())
-            random.shuffle(l)
-            dictionary = dict(l)
-            return dictionary
+        rand_list = []
+        for key in dictionary:
+            rand_list.append(key)
+        random.shuffle(rand_list)
+        print(rand_list)
+        out_dictionary = {}
+        for key in dictionary:
+            out_dictionary[key] = dictionary[rand_list[key-1]]
+        return out_dictionary
     

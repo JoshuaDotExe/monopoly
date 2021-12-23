@@ -18,28 +18,41 @@ class event:
             return p
         
         def jail(current_player):
-            if current_player.is_jailed == False:
+            if current_player.is_jailed == 0:
                 print("You're just visiting!")
                 return current_player
+             
             else:
+                
+                def jail_pay(current_player):
+                    current_player = player.bal_minus(current_player, 50)
+                    current_player.is_jailed = 0
+                    print('Much obliged, you\'re free to go!')
+                    return current_player
+                def jail_roll(current_player):
+                    print('Good luck getting those doubles!')    
+                    die1 = random.randint(1,6)
+                    die2 = random.randint(1,6)
+                    if die1 == die2:
+                        print(f'Double {die1}!\nYou\'re free to go!')
+                        current_player.is_jailed = False
+                    else:
+                        print(f'Rolled a {die1} and a {die2}\nYou have {4-current_player.is_jailed} more turns left in your sentence!') #Should add 3 turn rule by turning is_jailed into an int
+                        current_player.is_jailed += 1
+                        if current_player.is_jailed == 4:
+                            current_player.is_jailed = 0
+                            print('You\'ve served your sentence, you\'re free to go!')
+                    return current_player
+                
+                prison_options = {
+                    'PAY' : jail_pay,
+                    'ROLL' : jail_roll
+                }
                 print('Pay the fine or serve your sentence!!')
-                current_player.is_jailed = True
                 user_in = input('Type in PAY or ROLL :')
                 while True:
-                    if user_in.upper == 'PAY':
-                        current_player = player.bal_minus(current_player, 50)
-                        current_player.is_jailed = False
-                        print('Much obliged, you\'re free to go!')
-                        break
-                    elif user_in.upper == 'ROLL':
-                        print('Good luck getting those doubles!')    
-                        die1 = random.randint(1,6)
-                        die2 = random.randint(1,6)
-                        if die1 == die2:
-                            print(f'Double {die1}!\nYou\'re free to go!')
-                            current_player.is_jailed = False
-                        else:
-                            print(f'Rolled a {die1} and a {die2}\nLooks like you\'ll be staying here a while longer!') #Should add 3 turn rule by turning is_jailed into an int
+                    if user_in.upper in prison_options:
+                        current_player = prison_options[user_in.upper](current_player)
                         break
                     else:
                         print('Please input PAY or ROLL')
@@ -51,9 +64,7 @@ class event:
             return current_player
         
         def go_2_jail(current_player):
-            print('Go Straight to jail! Do not pass go and do not collect $200!')
-            current_player.space = 10
-            current_player.is_jailed = True
+            current_player = event.jailer()
             return current_player
         def in_tax(current_player):
             print('Pay $200 in income taxes!')
@@ -73,10 +84,11 @@ class event:
         }
         return event_index
     
-    def jailer():
+    def jailer(p):
         print('Go straight to jail! Do not pass go and do not collect $200!')
-        player_space = 10
-        return player_space
+        p.space = 10
+        p.is_jailed = 1
+        return p
 
 class rail_event:
     def __init__(self, name, ID, value, owner, rent, num_of_houses):

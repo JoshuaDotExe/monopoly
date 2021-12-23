@@ -1,0 +1,556 @@
+import random, os
+
+
+            
+    
+    def broke(p, game_board, owed):  #Takes in a player and finds out if they have properties, lists their properties, gives them an option of what to sell and how much it'll give them, doesn't let them stop selling till their owed is positive then returns the owned to add to their balance
+        print(f'Debt = ${owed}')
+        original_debt = owed
+        total_value = 0
+        
+        d = property_gather(p.num, game_board)
+        for x in d:
+            total_value += x.value/2
+            
+        if total_value >= owed:
+            name, prop_val = 'Name:', 'Mortgage Value:'
+            print(f'Your owned properties are:\n{name: <12}|  ${prop_val}')
+            for key in d:
+                print(f'{key: <12}|  ${d[key][0]}')
+            
+            user_in = input('Please type the name of a property you would like to mortgage: ')
+            while True:
+                if user_in in d.keys():
+                    game_board[d.get(user_in)[1]].owner = 0
+                    print(f'Debt = ${owed} - ${d.get(user_in)[0]} = ${owed - d.get(user_in)[0]}')
+                    owed -= d.get(user_in)[0]
+                    game_board[d.get(user_in)[1]].owner = 0
+                    if owed > 0:
+                        user_in = input('Please type the name of a property you would like to mortgage: ')
+                    else:
+                        p.balance = abs(owed)
+                        owed = original_debt
+                        return p, game_board, owed
+                elif user_in.upper() == 'FORFEIT':
+                    print('Player gives up')
+                    owed = original_debt
+                    p.balance = None
+                    return p, game_board, owed
+                else:
+                    user_in = input('Unknown name! WARNING: The names are case-sensitive!')
+                    
+                    
+        else:
+            print('Your property value is not enough! GAME OVER')
+            owed = total_value
+            p.balance = None
+            return p, game_board, owed
+
+class property:
+    def __init__(self, name, value, rent, num_of_houses, owner):
+        self.name = name
+        self.value = value
+        self.rent = rent
+        self.num_of_houses = num_of_houses
+        self.owner = owner
+    
+    def __repr__(self):
+        return "Property : {}\nPrice ${}, Rent {}\nHouses = {}, Owner = Player {}".format(self.name, self.value, self.rent, self.num_of_houses, self.owner)
+    
+    def landed(current_player, game_board, player_list):
+        current_owner = game_board[current_player.space].owner
+        if current_owner == 0:
+            current_player, game_board = property.unowned(current_player, game_board)
+            if current_owner == current_player.num:
+                current_player, game_board = game_board.rail_check(current_player, game_board)
+            else:
+                pass
+        elif current_owner == current_player.num:
+            print('You own this!')
+        elif current_owner != current_player.num:
+            current_player, game_board, player_list = property.owned(current_player, game_board, player_list)
+        else:
+            print('Owner value: Invalid')
+        return current_player, game_board, player_list
+    
+    def owned(p, board, player_list):
+        owner = player_list[board[p.space].owner].name
+        rent = board[p.space].rent[board[p.space].num_of_houses]
+        
+        print(f'Uh oh! Looks like it\'s owned by {owner}')
+        if player_list[board[p.space].owner].is_jailed > 0:
+            print('Looks like they\'re in jail, guess they miss out!')
+            return p, board, player_list
+        print(f'With {board[p.space].num_of_houses} houses, pay rent of ${rent} to {owner}!')
+        if p.balance < rent:
+            print('Looks like you need some more funds! Lets see if there\'s anything for you to mortgage')
+            owed = p.balance - rent
+            player_bal = p.balance
+            p, board, owed = player.broke(p, board, owed)
+            if p.balance is None:
+                rent = player_bal + (rent-owed)
+                player_list[board[p.space].owner] = player.bal_plus(player_list[board[p.space].owner], rent)
+                print(f'Player {p.num} : {p.name} is out!')
+                for x in board:
+                    if x.owner == p.num:
+                        x.owner, x.num_of_houses = 0, 0
+                        print(f'{x.name} is now unowned!')
+                    else:
+                        print('They owned no properties.')
+                        pass
+                del player_list[p.num]
+            else:
+                print('You\'ve managed to pay off your debts! For now...')
+                p = player.bal_minus(p, rent)
+                player_list[board[p.space].owner] = player.bal_plus(player_list[board[p.space].owner], rent)
+        else:
+            p = player.bal_minus(p, rent)
+            player_list[board[p.space].owner] = player.bal_plus(player_list[board[p.space].owner], rent)
+        return p, board, player_list
+    
+    def unowned(p, board):
+        if board[p.space].value <= p.balance:
+            
+            def buy(p, board):
+                print(f'Balance = ${p.balance} - ${board[p.space].value} = ${p.balance - board[p.space].value}\nCongratulations! You\'ve bought {board[p.space].name}')
+                p.balance -= board[p.space].value
+                board[p.space].owner = p.num
+                return p, board
+            def no_buy(p, board):
+                print('Maybe next time!')
+                return p, board
+            
+            d = {
+                'YES' : buy,
+                'NO' : no_buy
+            }
+            
+            user_in = input(f'This property is unowned! Would you like to purchase it for ${board[p.space].value}?\nYES or NO : ')
+            while True:
+                if user_in.upper() in d:
+                    d[user_in.upper()](p, board)
+                    return p, board
+                else:
+                    user_in = input('Please enter a YES or NO :')
+        else:
+            print('Looks like you don\'t have enough for this property! Maybe next time')
+            return p, board
+    
+    def home_turf():
+        print('You own this! Safe and sound, for now!')
+        return
+
+class event:
+    def __init__(self, name, ID):
+        self.name = name
+        self.ID = ID
+    
+    def __repr__(self):
+        return "Event : {}, ID : {}".format(self.name, self.ID)
+    
+    def diction():
+        def go(p):
+            print('Collect $400!')
+            p = player.bal_plus(p, 400)
+            return p
+        
+        def jail(current_player):
+            if current_player.is_jailed == 0:
+                print("You're just visiting!")
+                return current_player
+             
+            else:
+                
+                def jail_pay(current_player):
+                    current_player = player.bal_minus(current_player, 50)
+                    current_player.is_jailed = 0
+                    print('Much obliged, you\'re free to go!')
+                    return current_player
+                def jail_roll(current_player):
+                    print('Good luck getting those doubles!')    
+                    die1 = random.randint(1,6)
+                    die2 = random.randint(1,6)
+                    if die1 == die2:
+                        print(f'Double {die1}!\nYou\'re free to go!')
+                        current_player.is_jailed = False
+                    else:
+                        print(f'Rolled a {die1} and a {die2}\nYou have {4-current_player.is_jailed} more turns left in your sentence!') #Should add 3 turn rule by turning is_jailed into an int
+                        current_player.is_jailed += 1
+                        if current_player.is_jailed == 4:
+                            current_player.is_jailed = 0
+                            print('You\'ve served your sentence, you\'re free to go!')
+                    return current_player
+                
+                prison_options = {
+                    'PAY' : jail_pay,
+                    'ROLL' : jail_roll
+                }
+                print('Pay the fine or serve your sentence!!')
+                user_in = input('Type in PAY or ROLL :')
+                while True:
+                    if user_in.upper in prison_options:
+                        current_player = prison_options[user_in.upper](current_player)
+                        break
+                    else:
+                        print('Please input PAY or ROLL')
+                return current_player
+                
+                          
+        def free_prk(current_player):
+            print('Woo! Free Parking!')
+            return current_player
+        
+        def go_2_jail(current_player):
+            current_player = event.jailer()
+            return current_player
+        def in_tax(current_player):
+            print('Pay $200 in income taxes!')
+            current_player = player.bal_minus(current_player, 200)
+            return current_player
+        def lib_tax(current_player):
+            print('Pay $100 in taxes!')
+            current_player = player.bal_minus(current_player, 100)
+            return current_player
+        event_index = {
+            0 : go,
+            4 : in_tax,
+            38 : lib_tax,
+            10 : jail,
+            20 : free_prk,
+            30 : go_2_jail
+        }
+        return event_index
+    
+    def jailer(p):
+        print('Go straight to jail! Do not pass go and do not collect $200!')
+        p.space = 10
+        p.is_jailed = 1
+        return p
+
+class rail_event:
+    def __init__(self, name, ID, value, owner, rent, num_of_houses):
+        self.name = name
+        self.ID = ID
+        self.value = value
+        self.owner = owner
+        self.rent = rent
+        self.num_of_houses = num_of_houses
+    
+    def __repr__(self):
+        return "Property : {}\nPrice ${}, Rent {}\nHouses = {}, Owner = Player {}".format(self.name, self.value, self.rent, self.num_of_houses, self.owner)
+    
+    def rail_call(p, board, player_list):
+        if board[p.space].owner == 0:
+            if board[p.space].value <= p.balance:
+            
+                def buy(p, board, player_list):
+                    print(f'Balance = ${p.balance} - ${board[p.space].value} = ${p.balance - board[p.space].value}\nCongratulations! You\'ve bought {board[p.space].name}')
+                    p.balance -= board[p.space].value
+                    board[p.space].owner = p.num
+                    return p, board, player_list
+                def no_buy(p, board, player_list):
+                    print('Maybe next time!')
+                    return p, board, player_list
+                
+                d = {
+                    'YES' : buy,
+                    'NO' : no_buy
+                }
+                
+                user_in = input(f'This property is unowned! Would you like to purchase it for ${board[p.space].value}?\nYES or NO : ')
+                while True:
+                    if user_in.upper() in d:
+                        return d[user_in.upper()](p, board, player_list)
+                    else:
+                        user_in = input('Please enter a YES or NO :')
+            else:
+                print('Looks like you don\'t have enough for this property! Maybe next time')
+        elif board[p.space].owner == p.num:
+            print('You own this! Safe and sound, for now!')
+        elif board[p.space].owner != p.num:
+            p, board, player_list = property.owned(p, board, player_list)
+        else:
+            print('Owner value: Invalid')
+        return p, board, player_list
+        
+class util_event:
+    def __init__(self, name, ID, value, owner, num_of_houses):
+        self.name = name
+        self.ID = ID
+        self.value = value
+        self.owner = owner
+        self.num_of_houses = num_of_houses
+    
+    def __repr__(self):
+        return "Property : {}\nPrice ${}\nHouses = {}, Owner = Player {}".format(self.name, self.value, self.num_of_houses, self.owner)
+    
+    def util_call(p, board, player_list, roll):
+        p_space = p.space
+        p_num = p.num
+        if board[p_space].owner == 0:
+            p, board = property.unowned(p, board)
+            if board[p_space].owner:
+                util_owned = 0
+                util_list = [board[12], board[28]]
+                for x in util_list:
+                    if x.owner == p_num:
+                        util_owned += 1
+                for x in util_list:
+                    x.num_of_houses = util_owned
+            else:
+                pass
+        elif board[p_space].owner == p_num:
+            print('You own this!')
+        elif board[p_space].owner != p_num:
+            owner_name = player_list[board[p.space].owner].name
+            if board[p.space].num_of_houses == 1:
+                multiplier = 4
+            elif board[p.space].num_of_houses == 2:
+                multiplier = 10
+            rent = multiplier * roll
+            print(f'Uh oh! Looks like it\'s owned by {owner_name}')
+            print(f'With a roll of {roll} and a multiplier of {multiplier}x, pay rent of ${rent} to {owner_name}!')
+            if p.balance < rent:
+                print('Looks like you need some more funds! Lets see if there\'s anything for you to mortgage')
+                owed = p.balance - rent
+                player_bal = p.balance
+                p, board, owed = player.broke(p, board, owed)
+                if p.balance is None:
+                    rent = player_bal + (rent-owed)
+                    player_list[board[p.space].owner] = player.bal_plus(player_list[board[p.space].owner], rent)
+                    print(f'Player {p.num} : {p.name} is out!')
+                    for x in board:
+                        if x.owner == p.num:
+                            x.owner, x.num_of_houses = 0, 0
+                            print(f'{x.name} is now unowned!')
+                        else:
+                            print('They owned no properties.')
+                            pass
+                    del player_list[p.num]
+                else:
+                    print('You\'ve managed to pay off your debts! For now...')
+                    p = player.bal_minus(p, rent)
+                    player_list[board[p.space].owner] = player.bal_plus(player_list[board[p.space].owner], rent)
+            else:
+                p = player.bal_minus(p, rent)
+                player_list[board[p.space].owner] = player.bal_plus(player_list[board[p.space].owner], rent)
+        return p, board, player_list
+    
+    def util_check(current_player, board):
+        num_of_telecom = 0
+        l = [board[12], board[28]]
+        for x in l:
+            if x.owner == current_player.num:
+                num_of_telecom += 1
+            else:
+                pass
+        for x in l:
+            if x.owner == current_player.num:
+                x.num_of_houses = num_of_telecom
+                print(f'Num telecom = {x.num_of_houses} on {x.name}')
+            else:
+                pass
+        return current_player, board
+
+def main():
+    game_board = board_init() 
+    event_index = event.diction()
+    player_list = player.debug_player_create()
+    community_chest_index, chance_index = card.com_chest_init(), card.chance_init()
+    print('All dependencies loaded, program starting...\n')
+    
+    while True:
+        for x in player_list:         #Grabs player data
+            p = player_list[x]
+            playercmd = input(f'Player {p.num}/{p.name}!\n    Position = {game_board[p.space].name}\n    Balance = ${p.balance}\nWhat would you like to do?\nROLL or TRADE or BUILD or HELP : ')
+            while True: #using break ends the turn, reduces num of if statements 
+                if playercmd.upper() == 'ROLL':
+                    if p.is_jailed > 0:
+                        print('You\'re still in jail!')
+                        p = event_index[10](p)
+                        break
+                    roll_total = 0
+                    die1, die2 = random.randint(1,6), random.randint(1,6)
+                    roll_total += die1 + die2
+                    if die1 == die2:
+                        print(f'Double {die1}!')
+                        die1, die2 = random.randint(1,6), random.randint(1,6)
+                        roll_total += die1 + die2
+                        if die1 == die2:
+                            print(f'Double {die1}!')
+                            die1, die2 = random.randint(1,6), random.randint(1,6)
+                            roll_total += die1 + die2
+                            if die1 == die2:
+                                print(f'Double {die1}!? That\'s a double too many!')
+                                p = event.jailer(p)
+                                break
+                            else:
+                                print(f'Rolled a {die1} and a {die2}')
+                        else:
+                            print(f'Rolled a {die1} and a {die2}')
+                    else:
+                        print(f'Rolled a {die1} and a {die2}')
+                        
+                    p.space += roll_total
+                    if p.space != p.space%40:
+                        print('Passed GO! Collect $200!')
+                        p.space = p.space%40
+                        p = player.bal_plus(p, 200)
+                    else:
+                            pass
+                        
+                    if type(game_board[p.space]) is card and game_board[p.space].ID == 2: #Allows for the chance space chance cards to work, DO NOT TOUCH
+                        print('Landed on Chance! Pick up a card!')
+                        p, game_board, player_list = chance_index[1](p, game_board, player_list)
+
+                    if type(game_board[p.space]) is card and game_board[p.space].ID == 1:
+                        print('Landed on Community Chest! Pick up a card!')
+                        p, game_board, player_list = community_chest_index[1](p, game_board, player_list)
+                    
+                    if type(game_board[p.space]) is property:
+                        print(f'Landed on {game_board[p.space].name}')
+                        p, game_board, player_list = property.landed(p, game_board, player_list)
+                    
+                    elif type(game_board[p.space]) is event:
+                        print(f'Landed on {game_board[p.space].name}')
+                        p = event_index[p.space](p)
+                        
+                    elif type(game_board[p.space]) is rail_event:
+                        print(f'Landed on {game_board[p.space].name}')
+                        p, game_board, player_list = rail_event.rail_call(p, game_board, player_list)
+                    elif type(game_board[p.space]) is util_event:
+                        print(f'Landed on {game_board[p.space].name}')
+                        p, game_board, player_list = util_event.util_call(p, game_board, player_list, roll_total)
+                        
+                    else:
+                        print('Something\'s gone very wrong here')
+                    print('\n')
+                    print(game_board[p.space])
+                    break
+                        
+                elif playercmd.upper() == 'TRADE':
+                    print('Func not implemented yet')
+                    break
+                elif playercmd.upper() == 'BUILD':
+                    print('Func not implemented yet')
+                    break
+                elif playercmd.upper() == 'HELP':
+                    print('Func not implemented yet')
+                    break
+                elif playercmd.upper() == 'MY PROPERTIES':
+                    print(f'{property_gather(p.num, game_board)}')
+                else:
+                    playercmd = input('Please enter ROLL or TRADE or BUILD or HELP : ')
+            print('----------------------------------------\n\n----------------------------------------')
+
+def landed(current_player, game_board, player_list):
+        current_owner = game_board[current_player.space].owner
+        if current_owner == 0:
+            current_player, game_board = property.unowned(current_player, game_board)
+            if current_owner == current_player.num:
+                current_player, game_board = game_board.rail_check(current_player, game_board)
+            else:
+                pass
+        elif current_owner == current_player.num:
+            print('You own this!')
+        elif current_owner != current_player.num:
+            current_player, game_board, player_list = property.owned(current_player, game_board, player_list)
+        else:
+            print('Owner value: Invalid')
+        return current_player, game_board, player_list
+    
+    def owned(p, board, player_list):
+        owner = player_list[board[p.space].owner].name
+        rent = board[p.space].rent[board[p.space].num_of_houses]
+        
+        print(f'Uh oh! Looks like it\'s owned by {owner}')
+        if player_list[board[p.space].owner].is_jailed > 0:
+            print('Looks like they\'re in jail, guess they miss out!')
+            return p, board, player_list
+        print(f'With {board[p.space].num_of_houses} houses, pay rent of ${rent} to {owner}!')
+        if p.balance < rent:
+            print('Looks like you need some more funds! Lets see if there\'s anything for you to mortgage')
+            owed = p.balance - rent
+            player_bal = p.balance
+            p, board, owed = player.broke(p, board, owed)
+            if p.balance is None:
+                rent = player_bal + (rent-owed)
+                player_list[board[p.space].owner] = player.bal_plus(player_list[board[p.space].owner], rent)
+                print(f'Player {p.num} : {p.name} is out!')
+                for x in board:
+                    if x.owner == p.num:
+                        x.owner, x.num_of_houses = 0, 0
+                        print(f'{x.name} is now unowned!')
+                    else:
+                        print('They owned no properties.')
+                        pass
+                del player_list[p.num]
+            else:
+                print('You\'ve managed to pay off your debts! For now...')
+                p = player.bal_minus(p, rent)
+                player_list[board[p.space].owner] = player.bal_plus(player_list[board[p.space].owner], rent)
+        else:
+            p = player.bal_minus(p, rent)
+            player_list[board[p.space].owner] = player.bal_plus(player_list[board[p.space].owner], rent)
+        return p, board, player_list
+    
+    def unowned(p, board):
+        if board[p.space].value <= p.balance:
+            
+            def buy(p, board):
+                print(f'Balance = ${p.balance} - ${board[p.space].value} = ${p.balance - board[p.space].value}\nCongratulations! You\'ve bought {board[p.space].name}')
+                p.balance -= board[p.space].value
+                board[p.space].owner = p.num
+                return p, board
+            def no_buy(p, board):
+                print('Maybe next time!')
+                return p, board
+            
+            d = {
+                'YES' : buy,
+                'NO' : no_buy
+            }
+            
+            user_in = input(f'This property is unowned! Would you like to purchase it for ${board[p.space].value}?\nYES or NO : ')
+            while True:
+                if user_in.upper() in d:
+                    d[user_in.upper()](p, board)
+                    return p, board
+                else:
+                    user_in = input('Please enter a YES or NO :')
+        else:
+            print('Looks like you don\'t have enough for this property! Maybe next time')
+            return p, board
+    
+    def home_turf():
+        print('You own this! Safe and sound, for now!')
+        return
+
+
+def property_gather(p_num, game_board):
+        d = {}
+        for x in game_board:
+            if type(x) != event and type(x) != card and p_num == x.owner:
+                d[x.name] = tuple(x.value/2, game_board.index(x))
+            else:
+                pass
+        return d
+
+
+
+    
+        def jail(current_player):
+            if current_player.jailStats == 0:
+                print("You're just visiting!")
+                return current_player
+             
+            else:
+                print('Pay the fine or serve your sentence!!')
+                user_in = input('Type in PAY or ROLL :')
+                while True:
+                    if user_in.upper in prison_options:
+                        current_player = prison_options[user_in.upper](current_player)
+                        break
+                    else:
+                        print('Please input PAY or ROLL')
+                return current_player
